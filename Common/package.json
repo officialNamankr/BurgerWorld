@@ -1,14 +1,14 @@
 {
   "name": "@burger-world.com/common",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
     "build/**/*"
   ],
   "publishConfig": {
-  "access": "public"
-},
+    "access": "public"
+  },
   "scripts": {
     "clean": "del-cli ./build/*",
     "build": "npm run clean && tsc",
