@@ -12,3 +12,4 @@ export * from "./middlewares/error-handler";
 export * from "./middlewares/require-roles";
 
 export * from "./events/types/userType";
+export * from "./events/types/orderStatus";
