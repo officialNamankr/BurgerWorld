@@ -1,13 +1,13 @@
 import express,{Request,Response} from "express";
 import { Product } from "../models/products";
 import { redisClient } from "../redisClient";
-import { NotFoundError, validateRequest } from "@burger-world.com/common";
+import { NotFoundError, requireAuth, requireRoles, validateRequest, UserType } from "@burger-world.com/common";
 import { body } from "express-validator";
 
 
 const router = express.Router();
 
-router.put("/api/products/:id",[body("title")
+router.put("/api/products/:id", requireAuth,requireRoles(UserType.ADMIN), [body("title")
     .not()
     .isEmpty()
     .withMessage("Title is required"),

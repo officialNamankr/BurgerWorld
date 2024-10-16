@@ -21,6 +21,11 @@ export default class UserController implements interfaces.Controller {
     //     res.send(users);
     // }
 
+    @httpGet("/me")
+    async getCurrentUser(req: Request, res: Response) {
+        res.send(req.currentUser);
+    }
+
     @httpPost("/signup", ...userCreationValildation, validateRequest)
     async createUser(req: Request, res: Response) {
         const user = await this.userService.addUser(req.body);

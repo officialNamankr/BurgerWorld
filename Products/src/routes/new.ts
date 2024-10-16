@@ -3,11 +3,11 @@ import {body} from "express-validator";
 import { Product } from "../models/products";
 import { redisClient } from "../redisClient";
 import _ from "lodash";
-import { BadRequestError, requireAuth, validateRequest } from "@burger-world.com/common";
+import { BadRequestError, requireAuth, requireRoles, validateRequest, UserType } from "@burger-world.com/common";
 
 const router = express.Router();
 
-router.post("/api/products",[
+router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
 
     body("title")
     .not()

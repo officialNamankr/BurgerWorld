@@ -34,7 +34,7 @@ export default class UserService{
         if(!isMatch){
             throw new NotAuthorizedError();
         }
-        const token = Jwt.sign({id:user._id, email:user.email}, process.env.JWT_KEY!);
+        const token = Jwt.sign({id:user._id, email:user.email, role:user.role}, process.env.JWT_KEY!);
         return {user, token};
     }
 
