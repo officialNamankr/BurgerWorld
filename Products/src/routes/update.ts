@@ -3,7 +3,7 @@ import { Product } from "../models/products";
 import { redisClient } from "../redisClient";
 import { NotFoundError, requireAuth, requireRoles, validateRequest, UserType } from "@burger-world.com/common";
 import { body } from "express-validator";
-
+import ProductPublisher from "../events/product.publisher";
 
 const router = express.Router();
 
@@ -47,6 +47,11 @@ router.put("/api/products/:id", requireAuth,requireRoles(UserType.ADMIN), [body(
     product.set({title,price,description,image,category,countInStock,discount});
     await product.save();
     await redisClient.hset("products",product.id,JSON.stringify(product));
+
+    const productPublisher = new ProductPublisher();
+    console.log("Publishing product: ");
+    await productPublisher.publish(product,"products","product.updated");
+
     res.status(200).send(product);
 });
 

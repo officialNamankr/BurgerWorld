@@ -24,3 +24,12 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: namankr301/burger_world_orders
+      context: Orders
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    

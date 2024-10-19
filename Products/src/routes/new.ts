@@ -4,6 +4,7 @@ import { Product } from "../models/products";
 import { redisClient } from "../redisClient";
 import _ from "lodash";
 import { BadRequestError, requireAuth, requireRoles, validateRequest, UserType } from "@burger-world.com/common";
+import ProductPublisher from "../events/product.publisher";
 
 const router = express.Router();
 
@@ -54,6 +55,11 @@ router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
     const addedproduct = _.pick(product,["id","title","price","description","image","category","discount","avgRating"]);
 
     await redisClient.hset("products",product.id,JSON.stringify(addedproduct));
+
+    const productPublisher = new ProductPublisher();
+    console.log("Publishing product: ");
+    
+    await productPublisher.publish(addedproduct,"products","product.created");
     
     res.status(201).send(addedproduct);
 });
