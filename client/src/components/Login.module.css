@@ -1,0 +1,27 @@
+/* body {
+    background: linear-gradient(to right, #cfcbd3, #aeafb1);
+    font-family: 'Arial', sans-serif;
+  } */
+  
+  .card {
+    border-radius: 10px;
+  }
+  
+  h3 {
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .form-control-lg {
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  button {
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
