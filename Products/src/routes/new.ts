@@ -5,6 +5,7 @@ import { redisClient } from "../redisClient";
 import _ from "lodash";
 import { BadRequestError, requireAuth, requireRoles, validateRequest, UserType } from "@burger-world.com/common";
 import ProductPublisher from "../events/product.publisher";
+import { Category } from "../models/categories";
 
 const router = express.Router();
 
@@ -41,20 +42,38 @@ router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
     .withMessage("Discount must be greater than 0").isFloat({lt:100}).withMessage("Discount must be less than 100"),
 ],validateRequest,async(req:Request,res:Response)=>{
 
-    const {title,price,description,image,category,countInStock,discount} = req.body;
-    const product = Product.build({
-        title,
-        price,
-        description,
-        image,
-        category,
-        countInStock,
-        discount
-    });
-    await product.save();
-    const addedproduct = _.pick(product,["id","title","price","description","image","category","discount","avgRating"]);
+    try{
+        const {title,price,description,image,category,countInStock,discount} = req.body;
+        let categoryFromCache = await redisClient.hget("categories",category);
+        let selectedCategoryId:string;
+        if(categoryFromCache){
+            const categoryFromCacheParsed = JSON.parse(categoryFromCache);
+            selectedCategoryId = categoryFromCacheParsed.id;
+        }else{
+            const selectedCategoryFromDB = await Category.findById(category);
+            if(!selectedCategoryFromDB){
+                throw new BadRequestError("Category does not exist");
+            }
+            selectedCategoryId = selectedCategoryFromDB.id;
+            await redisClient.hset("categories",category,JSON.stringify(selectedCategoryFromDB));
+        }
+        const product =  new Product({
+            title,
+            price,
+            description,
+            image,
+            category:selectedCategoryId,
+            countInStock,
+            discount
+        });
+        await product.save();
+        await product.populate({
+            path:"category",
+            select:"name"
+        });
+        const addedproduct = _.pick(product,["id","title","price","description","image","category","discount","avgRating"]);
 
-    await redisClient.hset("products",product.id,JSON.stringify(addedproduct));
+        await redisClient.hset("products",product.id,JSON.stringify(addedproduct));
 
     const productPublisher = new ProductPublisher();
     console.log("Publishing product: ");
@@ -62,6 +81,16 @@ router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
     await productPublisher.publish(addedproduct,"products","product.created");
     
     res.status(201).send(addedproduct);
+    }
+    catch(err){
+        console.error(err);
+    }
+  
+
+    //console.log(product);
+    
+
+    
 });
 
 export {router as newProductRouter};

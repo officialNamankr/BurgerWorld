@@ -15,13 +15,14 @@ router.get("/api/products/:id",async(req:Request,res:Response)=>{
     }
     console.log("Cache Missed");
     console.log(id);
-    
-    const product = await Product.findById({
-        id:id
+    const product = await Product.findById(id).populate({
+        path:"category",
+        select:"name"
     });
     if(!product){
         throw new NotFoundError();
     }
+    await redisClient.hset("products",product.id,JSON.stringify(product));
     res.status(200).send(product);
 });
 

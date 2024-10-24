@@ -15,24 +15,18 @@ function MainNavigation() {
   // const isLogin = localStorage.getItem("isAuthenticated") === "true"; 
   // const user = localStorage.getItem("email");
 
-
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(fetchCurrentUser());
   }, [dispatch]);
 
-
   // const role = Auth.role;
-
-
   return (
     <Navbar className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="#home">Burger World</Navbar.Brand>
+        <Navbar.Brand ><Link className="text-decoration-none fw-bold text-dark" to="/home">Burger World</Link></Navbar.Brand>
         <Navbar.Toggle />
-        <Navbar.Collapse className="justify-content-end">
-        
+        <Navbar.Collapse className="justify-content-end"> 
         {isLogin &&
           <Navbar.Text>
             Signed in as: {user}
@@ -49,11 +43,9 @@ function MainNavigation() {
           <Navbar.Text className='ms-3'>
             <Link to="/?mode=signup">Sign Up</Link>
           </Navbar.Text>}
-          
         </Navbar.Collapse>
       </Container>
     </Navbar>
   );
 }
-
 export default MainNavigation;

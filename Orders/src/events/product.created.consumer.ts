@@ -12,15 +12,12 @@ class ProductConsumer {
     private readonly queueName = 'product-created-queue';
     private readonly exchange = 'products';
     private readonly routingKey = 'product.created';
-
-
     constructor(@inject(Types .RabbitMQService) private rabbitMQService: RabbitMQService, private readonly productService: ProductService) {
         this.rabbitMQService.on('channelReady', async () => {
             await this.startConsuming();
         });
        this.startConsuming();
     }
-
     // Method to start consuming messages
     public async startConsuming(): Promise<void> {
         try {
@@ -40,7 +37,6 @@ class ProductConsumer {
             console.error(`Failed to consume messages from queue creation: ${this.queueName}`, error);
         }
     }
-
     // Callback to handle each message received from the queue
     private async handleMessage(msg: amqplib.Message | null) {
         try{
@@ -49,6 +45,11 @@ class ProductConsumer {
                 const messageContent = msg.content.toString();
                 const product = JSON.parse(messageContent);
                 console.log('Received product created message:', product);
+                const cat = {
+                    id: product.category.id,
+                    name: product.category.name
+                }
+                
                 
                 const productCreated:ProductAttrs = {
                     id: product.id,
@@ -56,14 +57,11 @@ class ProductConsumer {
                     price: product.price,
                     description: product.description,
                     image: product.image,
+                    category: cat,
                     discount: product.discount,
                     date:product.date
                 }
-                
-                
-                const savedProduct = await this.productService.createProduct(productCreated);
-                
-                
+                const savedProduct = await this.productService.createProduct(productCreated);               
                 console.log('Product created:', savedProduct);
                 //await this.rabbitMQService.acknowledgeMessage(msg);
                 

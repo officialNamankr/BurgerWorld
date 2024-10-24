@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import { Category, CategoryDoc } from "./categories";
 
 interface ProductAttrs {
     title: string;
     price: number;
     description: string;
     image: string;
-    category: string;
+    category: mongoose.Schema.Types.ObjectId | CategoryDoc;
     countInStock: number;
     discount: number;
 }
@@ -17,7 +18,7 @@ interface ProductDoc extends mongoose.Document {
     price: number;
     description: string;
     image: string;
-    category: string;
+    category: mongoose.Schema.Types.ObjectId | CategoryDoc;
     countInStock: number;
     avgRating: number;
     numReviews: number;
@@ -51,7 +52,8 @@ const productSchema = new mongoose.Schema({
         default: 0
     },
     category: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories",
         required: true
     },
     countInStock: {
@@ -85,6 +87,8 @@ const productSchema = new mongoose.Schema({
 productSchema.plugin(updateIfCurrentPlugin);
 productSchema.set("versionKey", "version");
 productSchema.statics.build = (attrs: ProductAttrs) => {
+    console.log(attrs);
+    
     return new Product(attrs);
 };
 

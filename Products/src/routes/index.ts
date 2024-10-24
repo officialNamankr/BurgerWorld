@@ -15,10 +15,13 @@ router.get("/api/products",async(req:Request,res:Response)=>{
     if(parsedProducts.length > 0){
          res.status(200).send(parsedProducts);
          return;
-    }
+    }  
     console.log("Cache Missed");
     
-    const products = await Product.find({},{id:1,title:1,price:1,image:1,category:1,discount:1,avgRating:1});
+    const products = await Product.find({}).populate({
+        path:"category",
+        select:"name"
+    });
     if(!products){
         throw new NotFoundError();
     }

@@ -12,6 +12,9 @@ import { newProductRouter } from "./routes/new";
 import { indexRouter } from "./routes";
 import { showRouter } from "./routes/show";
 import { updateRouter } from "./routes/update";
+import { newCategoryRouter } from "./routes/new.category";
+import { indexCategoryRouter } from "./routes/index.category";
+import { showCategoryRouter } from "./routes/show.category";
 const app = express();
 app.set('trust proxy', 1);
 app.use(json());
@@ -37,7 +40,10 @@ const rateLimiter = rateLimit({
 })
 app.use(rateLimiter);
 app.use((req,res,next)=>{currentUser(req,res,next)});
+app.use(showCategoryRouter);
+app.use(indexCategoryRouter);
 app.use(newProductRouter);
+app.use(newCategoryRouter);
 app.use(indexRouter);
 app.use(showRouter);
 app.use(updateRouter);

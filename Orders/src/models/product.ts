@@ -1,10 +1,16 @@
 import mongoose, { version } from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+
+interface category{
+    id: string;
+    name: string;
+}
 export interface ProductAttrs {
     id: string;
     title: string;
     price: number;
     description: string;
+    category: category;
     image: string;
     discount: number;
     date: Date;
@@ -15,6 +21,7 @@ export interface ProductDoc extends mongoose.Document {
     price: number;
     version: number;
     description: string;
+    category: category;
     image: string;
     discount: number;
     date: Date;
@@ -50,6 +57,16 @@ const productSchema = new mongoose.Schema({
     discount: {
         type: Number,
         required: true
+    },
+    category: {
+        id: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        }
     }
 }, {
     toJSON: {
@@ -80,6 +97,7 @@ productSchema.statics.build = (attrs: ProductAttrs) => {
         title: attrs.title,
         price: attrs.price,
         description: attrs.description,
+        category: attrs.category,
         image: attrs.image,
         discount: attrs.discount
     });
