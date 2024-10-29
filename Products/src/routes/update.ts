@@ -50,7 +50,7 @@ router.put("/api/products/:id", requireAuth,requireRoles(UserType.ADMIN), [body(
 
     const productPublisher = new ProductPublisher();
     console.log("Publishing product: ");
-    await productPublisher.publish(product,"products","product.updated");
+    await productPublisher.publish(product,"products.Updated");
 
     res.status(200).send(product);
 });

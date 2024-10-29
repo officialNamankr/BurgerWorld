@@ -14,34 +14,30 @@ class RabbitMQService {
         await this.initialize();
     }
     private async initialize() {
-        this.channel = await RabbitMQ.getInstance(this.rabbitMQUrl);
+        this.channel = await RabbitMQ.getInstance();
        // console.log(this.channel);
         
         //this.channel = await rabbitMQ.connect();
     }
 
     // Method to publish a message to an exchange
-    public async publishMessage(exchange: string, routingKey: string, message: string): Promise<void> {
+    public async publishMessage(exchange: string, message: string): Promise<void> {
         console.log("logging channel");
         
         console.log(this.channel);
         
         if (!this.channel) {
-        
-
-                await this.initialize();
-            
-           
+                await this.initialize();  
         }
         if(!this.channel) {
             throw new Error('RabbitMQ channel is not available');
         }
-        console.log(`Publishing message to exchange "${exchange}" with routing key "${routingKey}"`);
+        console.log(`Publishing message to exchange "${exchange}"`);
         
-        await this.channel.assertExchange(exchange, 'direct', { durable: false });
+        await this.channel.assertExchange(exchange, 'fanout', { durable: false });
 
-        this.channel.publish(exchange, routingKey, Buffer.from(message));
-        console.log(`Message published to exchange "${exchange}" with routing key "${routingKey}"`);
+        this.channel.publish(exchange, '', Buffer.from(message));
+        console.log(`Message published to exchange "${exchange}"`);
     }
 
     // Method to consume messages from a queue
@@ -49,7 +45,6 @@ class RabbitMQService {
         if (!this.channel) {
             throw new Error('RabbitMQ channel is not available');
         }
-
         await this.channel.assertQueue(queue, { durable: false });
         this.channel.consume(queue, callback, { noAck: true });
         console.log(`Consuming messages from queue: ${queue}`);

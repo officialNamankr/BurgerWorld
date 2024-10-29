@@ -10,9 +10,12 @@ import {
     interfaces,
 } from "inversify-express-utils";
 import { validateRequest } from "@burger-world.com/common";
+import UserCreatedPublisher from "../events/auth.created.publisher";
+import RabbitMQService from "../rabbitmq.service";
 
 @controller("/users")
 export default class UserController implements interfaces.Controller {
+    [key: string]: any;
     constructor(public readonly userService: UserService) {}
 
     // @httpGet("/")
@@ -29,6 +32,9 @@ export default class UserController implements interfaces.Controller {
     @httpPost("/signup", ...userCreationValildation, validateRequest)
     async createUser(req: Request, res: Response) {
         const user = await this.userService.addUser(req.body);
+        const rabbitmqInstance = await RabbitMQService.getInstance();
+        const userCreatedPublisher = new UserCreatedPublisher(rabbitmqInstance);
+        await userCreatedPublisher.publish(user.id, "users", "user.created");
         res.status(201).send(user);
     }
     @httpPost("/logout")

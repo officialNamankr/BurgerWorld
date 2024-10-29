@@ -2,7 +2,6 @@
 import "reflect-metadata";
 import { injectable } from "inversify";
 import amqplib from 'amqplib';
-import ProductConsumer  from './events/product.created.consumer';
 import EventEmmiter  from 'events';
 @injectable()
 class RabbitMQService extends EventEmmiter {
@@ -25,7 +24,7 @@ class RabbitMQService extends EventEmmiter {
     }
 
     // Initialize the RabbitMQ connection and channel
-    private async init() {
+    public async init() {
         try{
 
             if (!this.connection) {
@@ -71,7 +70,7 @@ class RabbitMQService extends EventEmmiter {
         if (!this.channel) {
             throw new Error('RabbitMQ channel is not available');
         }
-        await this.channel.assertExchange(exchange, 'fanout', { durable: false });
+        await this.channel.assertExchange(exchange, 'direct', { durable: false });
         this.channel.publish(exchange, routingKey, Buffer.from(message));
         console.log(`Message published to exchange "${exchange}" with routing key "${routingKey}"`);
     }
@@ -100,7 +99,7 @@ class RabbitMQService extends EventEmmiter {
             throw new Error('RabbitMQ channel is not available');
         }
         await this.channel.assertQueue(queue, { durable: false });
-        await this.channel.consume(queue, callback, { noAck: true });
+        this.channel.consume(queue, callback, { noAck: true });
         console.log(`Consuming messages from queue: ${queue}`);
     }
 

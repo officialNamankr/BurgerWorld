@@ -4,16 +4,15 @@ export class RabbitMQ {
     private static instance: RabbitMQ;
     private connection: Connection | null = null;
     private  channel: Channel | null = null;
-    private rabbitmqUrl:string = "";
+    private rabbitmqUrl:string = process.env.RABBITMQ_URL!;
 
-    constructor(rabbitmqUrl:string) {
-        this.rabbitmqUrl = rabbitmqUrl;
+    constructor() {
     }
 
-    public static async getInstance(rabbitmqUrl:string): Promise<amqplib.Channel | null> {
+    public static async getInstance(): Promise<amqplib.Channel | null> {
         if (!RabbitMQ.instance) {
             console.log("Instance not found, creating new instance...");
-            RabbitMQ.instance = new RabbitMQ(rabbitmqUrl);
+            RabbitMQ.instance = new RabbitMQ();
             return await RabbitMQ.instance.connect();
         }
         console.log("Instance found, returning existing instance...");

@@ -71,16 +71,22 @@ router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
             path:"category",
             select:"name"
         });
-        const addedproduct = _.pick(product,["id","title","price","description","image","category","discount","avgRating"]);
+        //const addedproduct = _.pick(product,["id","title","price","description","image","category","discount","avgRating","countInStock"]);
 
-        await redisClient.hset("products",product.id,JSON.stringify(addedproduct));
+        await redisClient.hset("products",product.id,JSON.stringify(product));
+        const cachedCategoryDetails = await redisClient.hget("categoriesdetails",category);
+        if(cachedCategoryDetails){
+            const categoryDetails = JSON.parse(cachedCategoryDetails);
+            categoryDetails.products.push(product);
+            await redisClient.hset("categoriesdetails",category,JSON.stringify(categoryDetails));
+        }
 
     const productPublisher = new ProductPublisher();
     console.log("Publishing product: ");
     
-    await productPublisher.publish(addedproduct,"products","product.created");
+    await productPublisher.publish(product,"product.created");
     
-    res.status(201).send(addedproduct);
+    res.status(201).send(product);
     }
     catch(err){
         console.error(err);

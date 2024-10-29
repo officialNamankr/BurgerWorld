@@ -2,17 +2,17 @@ import { inject, injectable } from 'inversify';
 import { Types } from '../types/types';
 import RabbitMQService from '../rabbitmq.service';
 import amqplib from 'amqplib';
-import { ProductService } from '../services/Product.service';
-import { ProductAttrs } from '../models/product';
+import { CartService } from '../services/cart.service';
+import { CartAttrs } from '../models/cart';
 import "reflect-metadata";
 
-@injectable()
-class ProductCreatedConsumer {
+@injectable() 
+class AuthCreatedConsumer {
     //private rabbitMQService: RabbitMQService;
-    private readonly queueName = 'order-product-created-queue';
-    private readonly exchange = 'product.created';
-    private readonly routingKey = 'product.created';
-    constructor(@inject(Types .RabbitMQService) private rabbitMQService: RabbitMQService, private readonly productService: ProductService) {
+    private readonly queueName = 'user-created-queue';
+    private readonly exchange = 'users';
+    private readonly routingKey = 'user.created';
+    constructor(@inject(Types .RabbitMQService) private rabbitMQService: RabbitMQService, private readonly cartService: CartService) {
         this.rabbitMQService.on('channelReady', async () => {
             await this.startConsuming();
         });
@@ -21,6 +21,7 @@ class ProductCreatedConsumer {
     // Method to start consuming messages
     public async startConsuming(): Promise<void> {
         try {
+
              // 1. Ensure the exchange exists
              const channel = await this.rabbitMQService.getChannel();
              await channel.assertExchange(this.exchange, 'fanout', { durable: false });
@@ -42,35 +43,22 @@ class ProductCreatedConsumer {
 
             if (msg !== null) {
                 const messageContent = msg.content.toString();
-                const product = JSON.parse(messageContent);
-                console.log('Received product created message:', product);
-                const cat = {
-                    id: product.category.id,
-                    name: product.category.name
+                const userId  = JSON.parse(messageContent);
+                console.log('Received Auth created message:', userId);
+                const cart: CartAttrs = {
+                    userId: userId,
+                    products :[]
                 }
-                
-                
-                const productCreated:ProductAttrs = {
-                    id: product.id,
-                    title: product.title,
-                    price: product.price,
-                    description: product.description,
-                    image: product.image,
-                    category: cat,
-                    discount: product.discount,
-                    date:product.date
-                }
-                const savedProduct = await this.productService.createProduct(productCreated);               
-                console.log('Product created:', savedProduct);
+                const savedProduct = await this.cartService.createCart(cart);               
+                console.log('Cart created:', savedProduct);
                 //await this.rabbitMQService.acknowledgeMessage(msg);
-                
             }
         }
         catch(error){
-            console.error('Failed to process product created message:', error);
+            console.error('Failed to process user created message:', error);
             //this.rabbitMQService.acknowledgeMessage(msg);
         }
     }
 }
 
-export default ProductCreatedConsumer ;
+export default AuthCreatedConsumer;

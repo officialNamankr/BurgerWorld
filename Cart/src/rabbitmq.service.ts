@@ -13,6 +13,7 @@ class RabbitMQService extends EventEmmiter {
 
     constructor() {
         super();
+        
     }
 
     // Static method to get the single instance
@@ -71,7 +72,7 @@ class RabbitMQService extends EventEmmiter {
         if (!this.channel) {
             throw new Error('RabbitMQ channel is not available');
         }
-        await this.channel.assertExchange(exchange, 'fanout', { durable: false });
+        await this.channel.assertExchange(exchange, 'direct', { durable: false });
         this.channel.publish(exchange, routingKey, Buffer.from(message));
         console.log(`Message published to exchange "${exchange}" with routing key "${routingKey}"`);
     }

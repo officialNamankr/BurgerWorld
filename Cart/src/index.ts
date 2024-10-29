@@ -4,6 +4,7 @@ import { app,appConfigured } from "./app";
 import { container } from "./container";
 import ProductCreatedConsumer from "./events/product.created.consumer";
 import ProductUpdatedConsumer from "./events/product.updated.consumer";
+import AuthCreatedConsumer from "./events/auth.created.consumer";
 import RabbitMQService from "./rabbitmq.service";
 
 const start = async () => {
@@ -16,14 +17,15 @@ const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI!);
     console.log("Connected to MongoDb");
+
     const rabbitMQService = await RabbitMQService.getInstance();
     const productConsumer = await container.getAsync(ProductCreatedConsumer);
     const productUpdatedConsumer = await container.getAsync(ProductUpdatedConsumer);
+    const authConsumer = await container.getAsync(AuthCreatedConsumer);
     // console.log("product consumer started");
   } catch (err) {
     console.error(err);
   }
-  
 };
 
 appConfigured.listen(3000, () => {

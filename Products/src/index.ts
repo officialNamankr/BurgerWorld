@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { app } from "./app";
 import RabbitMQService from "./services/rabbitmqService";
+import RabbitMQ from "./rabbitmq";
 
 const start = async () => {
     if (!process.env.JWT_KEY) {
@@ -19,13 +20,14 @@ const start = async () => {
         await mongoose.connect(process.env.MONGO_URI!);
         console.log("Connected to MongoDb");
 
-        const rabbitMQ = new RabbitMQService();
+        const rabbitMQ =  new RabbitMQService()
 
-        await rabbitMQ.consumeMessages("products", (msg) => {
-            if (msg) {
-                console.log("Message received:", msg.content.toString());
-            }
-        });
+
+        // await rabbitMQ.consumeMessages("products", (msg) => {
+        //     if (msg) {
+        //         console.log("Message received:", msg.content.toString());
+        //     }
+        // });
         // await rabbitMQ.consumeMessages("products", (msg) => {
         //     if (msg) {
         //         console.log("Message received:", msg.content.toString());

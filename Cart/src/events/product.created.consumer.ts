@@ -2,21 +2,21 @@ import { inject, injectable } from 'inversify';
 import { Types } from '../types/types';
 import RabbitMQService from '../rabbitmq.service';
 import amqplib from 'amqplib';
-import { ProductService } from '../services/Product.service';
-import { ProductAttrs } from '../models/product';
+import { ProductService } from "../services/poduct.service";
+import { ProductAttrs } from "../models/products";
 import "reflect-metadata";
 
 @injectable()
 class ProductCreatedConsumer {
     //private rabbitMQService: RabbitMQService;
-    private readonly queueName = 'order-product-created-queue';
+    private readonly queueName = 'cart-product-created-queue';
     private readonly exchange = 'product.created';
     private readonly routingKey = 'product.created';
-    constructor(@inject(Types .RabbitMQService) private rabbitMQService: RabbitMQService, private readonly productService: ProductService) {
+    constructor(@inject(Types.RabbitMQService) private rabbitMQService: RabbitMQService, private readonly productService: ProductService) {
         this.rabbitMQService.on('channelReady', async () => {
             await this.startConsuming();
         });
-    //    this.startConsuming();
+       //this.startConsuming();
     }
     // Method to start consuming messages
     public async startConsuming(): Promise<void> {
@@ -27,7 +27,6 @@ class ProductCreatedConsumer {
 
              // 2. Ensure the queue exists
              await channel.assertQueue(this.queueName, { durable: false });
- 
              // 3. Bind the queue to the exchange using the routing key
              await channel.bindQueue(this.queueName, this.exchange, '');
             await this.rabbitMQService.consumeMessages(this.queueName, this.handleMessage.bind(this));
@@ -47,9 +46,7 @@ class ProductCreatedConsumer {
                 const cat = {
                     id: product.category.id,
                     name: product.category.name
-                }
-                
-                
+                }   
                 const productCreated:ProductAttrs = {
                     id: product.id,
                     title: product.title,
@@ -58,12 +55,14 @@ class ProductCreatedConsumer {
                     image: product.image,
                     category: cat,
                     discount: product.discount,
-                    date:product.date
+                    date:product.date,
+                    countInStock: product.countInStock
                 }
                 const savedProduct = await this.productService.createProduct(productCreated);               
-                console.log('Product created:', savedProduct);
+                console.log('Product created for Cart:', savedProduct);
                 //await this.rabbitMQService.acknowledgeMessage(msg);
-                
+            }else{
+                console.log('No product creation message received');
             }
         }
         catch(error){
@@ -73,4 +72,4 @@ class ProductCreatedConsumer {
     }
 }
 
-export default ProductCreatedConsumer ;
+export default ProductCreatedConsumer;

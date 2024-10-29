@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import RabbitMQService from "./rabbitmq.service";
 import { app,appConfigured } from "./app";
 const start = async () => {
   if (!process.env.JWT_KEY) {
@@ -10,6 +11,9 @@ const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI!);
     console.log("Connected to MongoDb");
+
+    const rabbitMQService = await new RabbitMQService().init();
+
   } catch (err) {
     console.error(err);
   }

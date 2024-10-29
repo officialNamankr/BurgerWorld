@@ -11,7 +11,7 @@ import {
 
 @controller("/orders")
 export class OrderController implements interfaces.Controller {
-
+    [key: string]: any;
     constructor(
         private readonly orderService: OrderService,
     ){}

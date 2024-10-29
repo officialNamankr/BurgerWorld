@@ -11,7 +11,7 @@ import { ProductUpdate } from '../interfaces/ProductUpdate';
 class ProductUpdatedConsumer {
     //private rabbitMQService: RabbitMQService;
     private readonly queueName = 'product-updation-Queue';
-    private readonly exchange = 'products';
+    private readonly exchange = 'products.updated';
     private readonly routingKey = 'product.updated';
 
 
@@ -19,7 +19,7 @@ class ProductUpdatedConsumer {
         this.rabbitMQService.on('channelReady', async () => {
             await this.startConsuming();
         });
-        this.startConsuming();
+        // this.startConsuming();
     }
 
     // Method to start consuming messages

@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: cart-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: cart
   template:
     metadata:
       labels:
-        app: auth
+        app: cart
     spec:
       containers:
-        - name: auth
-          image: namankr301/burger_world_auth
+        - name: cart
+          image: namankr301/burger_world_cart
           env:
             - name: JWT_KEY
               valueFrom:
@@ -24,20 +24,20 @@ spec:
             - name: MONGO_URI
               valueFrom:
                   secretKeyRef:
-                    name: auth-db
-                    key: userdburi
+                    name: cart-db
+                    key: MONGODB_URI
+            # - name: REDIS_HOST
+            #   value: cart-redis-srv
             - name: RABBITMQ_URL
               value: "amqp://rabbitmq-srv:5672"
-            # - name: REDIS_HOST
-            #   value: auth-redis-srv
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: cart-srv
 spec:
   selector:
-    app: auth
+    app: cart
   ports:
     - name: product
       protocol: TCP
