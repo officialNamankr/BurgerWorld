@@ -7,11 +7,16 @@ export interface GetCartAttrs {
     totalPrice: number;
 }
 
+export interface CartItemProduct{
+    id: Types.ObjectId;
+    title: string;
+    price: number;
+}
+
 export interface cartProduct{
-    product: ProductDoc;
+        product: CartItemProduct;
         quantity: number;
         price: number;
-        inStock: boolean;
 }
 
 export interface updateCartProducts {
@@ -28,4 +33,8 @@ export interface updateCartAttrs {
 export interface CartProdcutAttrs {
     product: ProductDoc;
     quantity: number;
+}
+
+export interface GetCart {
+    products: CartProdcutAttrs[] | [];
 }

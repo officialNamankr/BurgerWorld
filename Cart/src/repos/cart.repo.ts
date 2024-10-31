@@ -5,6 +5,7 @@ import { Product } from "../models/products";
 import { CartProdcutAttrs, GetCartAttrs, cartProduct, updateCartAttrs } from "../interfaces/Cart.Dto";
 import { Types } from "mongoose";
 import { ProductService } from "../services/poduct.service";
+import { GetCart } from "../interfaces/Cart.Dto";
 
 
 @injectable()
@@ -17,7 +18,7 @@ export class CartRepository {
         return cart;
     }
 
-    async findByUserId(userId: Types.ObjectId): Promise<CartDoc | null> {
+    async findByUserId(userId: Types.ObjectId): Promise<CartProdcutAttrs[] | null> {
         const cart = await Cart.findOne({userId}).populate({
             path: 'products.product',
             model: 'Products'
@@ -26,7 +27,7 @@ export class CartRepository {
         console.log(cart);
         
         if (!cart) return null;
-        return cart;   
+        return cart.products;   
     }
 
     // async deleteByUserId(userId: string, productId: string) {
@@ -59,7 +60,7 @@ export class CartRepository {
         if (!cartToUpdate) {
             return null;
         };
-
+        cartToUpdate.products = [];
         for(const updatedProduct of updatedProducts) {
             console.log("Updates");
             console.log(updatedProduct);

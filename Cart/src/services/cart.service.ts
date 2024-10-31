@@ -27,7 +27,7 @@ export class CartService {
             throw new NotFoundError();
         }
         const cartProducts: cartProduct[] = [];
-        const products = cart.products;
+        const products = cart;
         for (let i=0; i < products.length; i++) {
             const productId = new mongoose.Types.ObjectId(products[i].product.id);
             const product = await this.productService.getProduct(productId);
@@ -35,21 +35,24 @@ export class CartService {
                 continue;
             }
             const cartProduct: cartProduct = {
-                product: product,
+                product: {
+                    id: product.id,
+                    title: product.title,
+                    price: product.price,
+                },
                 price: product.price,
                 quantity: 0,
-                inStock: false
             }
-            if(products[i].quantity > product.countInStock) {
-                cartProduct.inStock = false;
-            }
+            // if(products[i].quantity > product.countInStock) {
+            //     cartProduct.inStock = false;
+            // }
             cartProduct.quantity = products[i].quantity;
+            cartProduct.price = product.price * products[i].quantity;
             cartProducts.push(cartProduct);
         }
-        const totalPrice = cartProducts.reduce((total, product) => total + (product.price * product.quantity), 0);
+        const totalPrice = cartProducts.reduce((total, product) => total + (product.price), 0);
         const totalQuantity = cartProducts.reduce((total, product) => total + product.quantity, 0);
         return {
-            userId: cart.userId,
             products: cartProducts,
             totalQuantity: totalQuantity,
             totalPrice: totalPrice
