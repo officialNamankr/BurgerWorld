@@ -1,5 +1,8 @@
 import { cartActions } from "./cart-slice";
 import { getToken } from "../utils/getToken";
+import { uiActions } from "./ui-slice";
+import { showNotification } from "./ui-actions";
+import { displayNotification } from "../components/Notification";
 
 export const fetchCartData = () => {
   const token = getToken();
@@ -21,6 +24,16 @@ export const fetchCartData = () => {
 
     try {
       const cartData = await fetchData();
+      dispatch(
+        uiActions.setNotification({
+          status: null,
+          title: null,
+          message: null,
+          isVisible: false,
+        })
+      );
+
+      console.log("Inside fetchCartData");
       console.log(cartData);
 
       dispatch(
@@ -83,15 +96,46 @@ export const sendCartData = (cart) => {
 
     try {
       await sendRequest();
-      //   dispatch(
-      //     uiActions.showNotification({
-      //       status: "success",
-      //       title: "Success!",
-      //       message: "Sent cart data successfully!",
-      //     })
-      //   );
+      console.log("sent cart data completed");
+
+      dispatch(
+        showNotification({
+          status: "success",
+          title: "Success!",
+          message: "cart updated successfully!",
+          isVisible: true,
+        })
+      );
+
+      //successNotification();
+      // dispatch(
+      // uiActions.setNotification({
+      //   status: "success",
+      //   title: "Success!",
+      //   message: "Sent cart data successfully!",
+      //   isVisible: true,
+      // })
+      // );
+      // dispatch(
+      //   uiActions.setNotification({
+      //     status: null,
+      //     title: null,
+      //     message: null,
+      //     isVisible: false,
+      //   })
+      // );
     } catch (error) {
       console.log(error);
+      dispatch(
+        showNotification({
+          status: "error",
+          title: "Error!",
+          message: "Ooops! something went wrong",
+          isVisible: true,
+        })
+      );
+
+      // errorNotification();
       //   dispatch(
       //     uiActions.showNotification({
       //       status: "error",

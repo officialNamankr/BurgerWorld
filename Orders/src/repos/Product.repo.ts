@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { injectable } from "inversify";
 import {Product, ProductAttrs, ProductDoc} from "../models/product";
+import { Types } from "mongoose";
 
 @injectable()
 export class ProductRepository {
@@ -9,7 +10,8 @@ export class ProductRepository {
     }
 
     async findById(id: string): Promise<ProductDoc | null> {
-        return await Product.findById(id);
+        const productId = new Types.ObjectId(id);
+        return await Product.findOne({ _id: productId });
     }
 
     async create(attrs: ProductAttrs): Promise<ProductDoc> {

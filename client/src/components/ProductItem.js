@@ -2,6 +2,7 @@ import { Button } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
 import { useDispatch } from "react-redux";
 import { cartActions } from "../store/cart-slice";
+import { uiActions } from "../store/ui-slice";
 
 function ProductItem({ props }) {
   console.log("props");

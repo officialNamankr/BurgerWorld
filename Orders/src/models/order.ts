@@ -4,14 +4,14 @@ import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { OrderStatus } from "@burger-world.com/common";
 export interface OrderAttrs {
     userId: string;
-    status: OrderStatus;
+    // status: OrderStatus;
     products: {
         product: ProductDoc;
         quantity: number;
         price: number;
     }[];
     discount: number;
-    date: Date;
+    // date: Date;
 }
 
 interface OrderDoc extends mongoose.Document {
@@ -24,9 +24,28 @@ interface OrderDoc extends mongoose.Document {
         quantity: number;
         price: number;
     }[];
+    totalPrice: number;
     discount: number;
     date: Date;
 }
+
+const OrderProductSchema = new mongoose.Schema({
+    product: {
+        ref : "Products",
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    quantity: {
+        type: Number,
+        required: true
+    },
+    price: {
+        type: Number,
+        required: true
+    }
+}, {
+    _id: false
+});
+
 
 const orderSchema = new mongoose.Schema({
     userId: {
@@ -35,26 +54,10 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        required: true
+        required: true,
+        default: OrderStatus.CREATED
     },
-    version: {
-        type: Number,
-        required: true
-    },
-    products: [{
-        product: {
-            ref : "Products",
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        quantity: {
-            type: Number,
-            required: true
-        },
-        price: {
-            type: Number,
-            required: true
-        }
-    }],
+    products: [OrderProductSchema],
     date: {
         type: mongoose.Schema.Types.Date,
         default: Date.now,
@@ -78,16 +81,20 @@ orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.virtual('totalPrice').get(function() {
     let total = this.products.reduce((total, product) => {
-        return total + (product.price * product.quantity);
+        return total + (product.price);
     }, 0);
     return total - ((this.discount / 100) * total);
 
 });
 
+orderSchema.set('toJSON', { virtuals: true });
+orderSchema.set('toObject', { virtuals: true });
+
 interface OrderModel extends mongoose.Model<OrderDoc> {
     build(attrs: OrderAttrs): OrderDoc;
 }
 orderSchema.statics.build = (attrs: OrderAttrs) => {
+    console.log(attrs);
     return new Order(attrs);
 }
 

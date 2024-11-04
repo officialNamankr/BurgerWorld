@@ -40,8 +40,6 @@ const rateLimiter = rateLimit({
 app.use(rateLimiter);
 app.use((req,res,next)=>{currentUser(req,res,next)});
 
-
-
 let server = new InversifyExpressServer(
     container,null,{
         rootPath: "/api"
@@ -49,11 +47,7 @@ let server = new InversifyExpressServer(
     app
 );
 
-
-
-
 let appConfigured = server.build();
-
 
 appConfigured.all('*', async(req, res) => {
     throw new NotFoundError();
@@ -62,9 +56,5 @@ appConfigured.all('*', async(req, res) => {
   appConfigured.use((err:Error,req:Request,res:Response,next:NextFunction)=>{
   errorHandler(err,req,res,next);
   });
-
-
-
-
 
 export {app, appConfigured};

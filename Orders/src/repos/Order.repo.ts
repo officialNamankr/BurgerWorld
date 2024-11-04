@@ -8,8 +8,15 @@ export class OrderRepository {
 
     
     async create(attrs: OrderAttrs) {
-        const order = Order.build(attrs);   
-        await order.save();
+        const order = Order.build(attrs);
+        console.log(order);
+        try{
+
+            await order.save();
+        } 
+        catch(err){
+            console.log(err);
+        }  
         return order;
     }
 
@@ -19,7 +26,10 @@ export class OrderRepository {
     }
 
     async findByUserId(userId: string) {
-        const orders = await Order.find({userId});
+        const orders = await Order.find({userId}).populate({
+            path: 'products.product',
+            model: 'Products'
+        });
         return orders;
     }
 

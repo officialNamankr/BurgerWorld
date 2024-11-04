@@ -9,9 +9,13 @@ import AuthGuard from "./utils/authGuard";
 import ProductsPage, { loader as loadProducts } from "./pages/ProductsPage";
 import HomeLayout from "./pages/HomeLayout";
 import CartPage, { loader as loadCart } from "./pages/CartPage";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchCartData, sendCartData } from "./store/cart-action";
 import { useDispatch, useSelector } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
+import { showNotification } from "./store/ui-actions";
+import { displayNotification } from "./components/Notification";
+import { uiActions } from "./store/ui-slice";
 
 let isInitial = true;
 
@@ -61,20 +65,31 @@ const router = createBrowserRouter([
 function App() {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
-  const [cartLoaded, setCartLoaded] = useState(false);
-  useEffect(() => {
-    dispatch(fetchCartData()).then(() => setCartLoaded(true));
-  }, [dispatch]);
+  const notificationData = useSelector((state) => state.ui);
 
   useEffect(() => {
     if (isInitial) {
       isInitial = false;
       return;
     }
-    if (cartLoaded) {
+    if (cart.changed) {
+      console.log("Sending cart data...");
       dispatch(sendCartData(cart));
     }
-  }, [dispatch, cart, cartLoaded]);
+  }, [dispatch, cart]);
+
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (notificationData.notificationVisible) {
+  //     console.log("notificationData in app.js");
+  //     console.log(notificationData);
+  //     displayNotification(notificationData);
+
+  //   }
+  // }, [notificationData]);
 
   return <RouterProvider router={router} />;
 }

@@ -8,6 +8,8 @@ import {
     httpPost,
     interfaces,
 } from "inversify-express-utils";
+import { OrderAttrs } from "../models/order";
+import { OrderCreateRequestDto } from "../interfaces/OrderDto";
 
 @controller("/orders")
 export class OrderController implements interfaces.Controller {
@@ -23,5 +25,18 @@ export class OrderController implements interfaces.Controller {
         return orders;
     }
 
-   
+    @httpPost("/")
+    async createOrder(req:Request, res:Response) {
+        const {products} = req.body;
+        const userid = req.currentUser!.id;
+        console.log(products);  
+        const orderToCreate: OrderCreateRequestDto = {
+            userId: userid,
+            products,
+            discount: 0,
+        }
+        // console.log(orderToCreate);
+        const order = await this.orderService.create(orderToCreate);
+        return order;
+    }
 }

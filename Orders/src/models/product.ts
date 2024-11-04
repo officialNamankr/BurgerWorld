@@ -17,6 +17,7 @@ export interface ProductAttrs {
 }
 
 export interface ProductDoc extends mongoose.Document {
+    id: string;
     title: string;
     price: number;
     version: number;
