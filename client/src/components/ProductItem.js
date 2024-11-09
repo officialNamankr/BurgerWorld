@@ -1,17 +1,23 @@
 import { Button } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { cartActions } from "../store/cart-slice";
-import { uiActions } from "../store/ui-slice";
-
+import { useNavigate } from "react-router-dom";
 function ProductItem({ props }) {
   console.log("props");
 
   console.log(props);
   const { title, description, image, id, price } = props;
 
+  const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
   function addToCart() {
+    if (!auth.isAuthenticated) {
+      navigate("/?mode=login");
+      return;
+    }
     dispatch(
       cartActions.addItemToCart({
         id,

@@ -36,7 +36,7 @@ class AuthCreatedConsumer {
         } catch (error) {
             console.error(`Failed to consume messages from queue creation: ${this.queueName}`, error);
         }
-    }
+    } 
     // Callback to handle each message received from the queue
     private async handleMessage(msg: amqplib.Message | null) {
         try{

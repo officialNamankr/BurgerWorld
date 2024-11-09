@@ -13,9 +13,8 @@ import { useEffect, useRef, useState } from "react";
 import { fetchCartData, sendCartData } from "./store/cart-action";
 import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-import { showNotification } from "./store/ui-actions";
-import { displayNotification } from "./components/Notification";
-import { uiActions } from "./store/ui-slice";
+
+import ErrorPage from "./pages/ErrorPage";
 
 let isInitial = true;
 
@@ -23,6 +22,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
