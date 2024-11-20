@@ -6,44 +6,59 @@ import _ from "lodash";
 import { BadRequestError, requireAuth, requireRoles, validateRequest, UserType } from "@burger-world.com/common";
 import ProductPublisher from "../events/product.publisher";
 import { Category } from "../models/categories";
-
+import { s3Client } from "../helpers/s3Config";
+import { upload } from "../helpers/multer";
+import { ObjectCannedACL, PutObjectCommand } from "@aws-sdk/client-s3";
+import path from "path";
 const router = express.Router();
 
-router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
+router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),
+// [
 
-    body("title")
-    .not()
-    .isEmpty()
-    .withMessage("Title is required"),
-    body("price")
-    .isFloat({gt:0})
-    .withMessage("Price must be greater than 0")
-    .isFloat({lt:1000000})
-    .withMessage("Price must be less than 1000000"),
-    body("description")
-    .not()
-    .isEmpty()
-    .withMessage("Description is required"),
-    body("image")
-    .not()
-    .isEmpty()
-    .withMessage("Image is required"),
-    body("category")
-    .not()
-    .isEmpty()
-    .withMessage("Category is required"),
-    body("countInStock")
-    .isFloat({gt:0})
-    .withMessage("CountInStock must be greater than 0")
-    .isFloat({lt:500})
-    .withMessage("CountInStock must be less than 500"),
-    body("discount")
-    .isFloat({gt:0})
-    .withMessage("Discount must be greater than 0").isFloat({lt:100}).withMessage("Discount must be less than 100"),
-],validateRequest,async(req:Request,res:Response)=>{
+//     body("title")
+//     .not()
+//     .isEmpty()
+//     .withMessage("Title is required"),
+//     body("price")
+//     .isFloat({gt:0})
+//     .withMessage("Price must be greater than 0")
+//     .isFloat({lt:1000000})
+//     .withMessage("Price must be less than 1000000"),
+//     body("description")
+//     .not()
+//     .isEmpty()
+//     .withMessage("Description is required"),
+//     body("category")
+//     .not()
+//     .isEmpty()
+//     .withMessage("Category is required"),
+//     body("countInStock")
+//     .isFloat({gt:0})
+//     .withMessage("CountInStock must be greater than 0")
+//     .isFloat({lt:500})
+//     .withMessage("CountInStock must be less than 500"),
+//     body("discount")
+//     .isFloat({gt:0})
+//     .withMessage("Discount must be greater than 0").isFloat({lt:100}).withMessage("Discount must be less than 100"),
+// ],
+validateRequest,upload.single("image"),async(req:Request,res:Response)=>{
 
     try{
-        const {title,price,description,image,category,countInStock,discount} = req.body;
+        const file = req.file;
+        if(!file){
+            throw new BadRequestError("Image is required");
+        }
+        const params = {
+            Bucket: process.env.S3_BUCKET_NAME!,
+            Key: `images/categories/${Date.now()}_${path.basename(file.originalname)}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+            ACL: ObjectCannedACL.public_read
+        }
+        const command = new PutObjectCommand(params);
+        const response = await s3Client.send(command);
+        const image = `https://${params.Bucket}.s3.ap-south-1.amazonaws.com/${params.Key}`;
+        const {title,price,description,category,countInStock,discount} = req.body;
         let categoryFromCache = await redisClient.hget("categories",category);
         let selectedCategoryId:string;
         if(categoryFromCache){
@@ -91,12 +106,6 @@ router.post("/api/products",requireAuth,requireRoles(UserType.ADMIN),[
     catch(err){
         console.error(err);
     }
-  
-
-    //console.log(product);
-    
-
-    
 });
 
 export {router as newProductRouter};

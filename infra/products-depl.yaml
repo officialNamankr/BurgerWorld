@@ -26,6 +26,21 @@ spec:
                   secretKeyRef:
                     name: products-db
                     key: MONGODB_URI
+            - name: S3_BUCKET_NAME
+              valueFrom:
+                  secretKeyRef:
+                    name: s3-bucket
+                    key: s3_bucket_name
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                  secretKeyRef:
+                    name: s3-admin-access-key
+                    key: s3_admin_access_key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                  secretKeyRef:
+                    name: s3-admin-secret-access-key
+                    key: s3_admin_secret_access_key
             - name: REDIS_HOST
               value: products-redis-srv
             - name: RABBITMQ_URL

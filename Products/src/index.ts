@@ -15,6 +15,17 @@ const start = async () => {
     if(!process.env.RABBITMQ_URL) {
         throw new Error("RABBITMQ_URL must be defined");
     }
+    if(!process.env.S3_BUCKET_NAME) {
+        throw new Error("s3_BUCKET_NAME must be defined");
+    }
+
+    if(!process.env.S3_ACCESS_KEY) {
+        throw new Error("S3_ACCESS_KEY must be defined");
+    }
+
+    if(!process.env.S3_SECRET_KEY) {
+        throw new Error("S3_SECRET_ACCESS_KEY must be defined");
+    }
 
     try {
         await mongoose.connect(process.env.MONGO_URI!);
