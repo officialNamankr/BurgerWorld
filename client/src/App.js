@@ -9,6 +9,7 @@ import AuthGuard from "./utils/authGuard";
 import ProductsPage, { loader as loadProducts } from "./pages/ProductsPage";
 import HomeLayout from "./pages/HomeLayout";
 import CartPage, { loader as loadCart } from "./pages/CartPage";
+import OrderPage, { loader as loadOrders } from "./pages/OrderPage";
 import { useEffect, useRef, useState } from "react";
 import { fetchCartData, sendCartData } from "./store/cart-action";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,6 +58,11 @@ const router = createBrowserRouter([
         path: "cart",
         element: <CartPage />,
         //loader: loadCart,
+      },
+      {
+        path: "orders",
+        element: <OrderPage />,
+        loader: loadOrders,
       },
     ],
   },

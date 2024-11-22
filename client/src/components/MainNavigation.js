@@ -33,14 +33,19 @@ function MainNavigation() {
           {isLogin && <Navbar.Text>Signed in as: {user}</Navbar.Text>}
           {isLogin && (
             <Navbar.Text className="ms-3">
-              <Link to="logout">Logout</Link>
+              <Link to="/cart">
+                <Cart size={20} />{" "}
+              </Link>
             </Navbar.Text>
           )}
           {isLogin && (
             <Navbar.Text className="ms-3">
-              <Link to="/cart">
-                <Cart size={20} />{" "}
-              </Link>
+              <Link to="/orders">My Orders</Link>
+            </Navbar.Text>
+          )}
+          {isLogin && (
+            <Navbar.Text className="ms-3">
+              <Link to="logout">Logout</Link>
             </Navbar.Text>
           )}
           {!isLogin && (

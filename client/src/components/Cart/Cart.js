@@ -1,4 +1,4 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import CartItem from "./CartItem";
 
 function Cart({ cartData }) {
@@ -26,6 +26,9 @@ function Cart({ cartData }) {
             <h3>{cartData && cartData.totalPrice}</h3>
           </Col>
         </Row>
+      </Container>
+      <Container className="mt-5 d-flex justify-content-center align-items-center">
+        <Button variant="success">Checkout</Button>
       </Container>
     </Container>
   );
