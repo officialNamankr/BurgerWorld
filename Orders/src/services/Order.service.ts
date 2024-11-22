@@ -45,7 +45,7 @@ export class OrderService {
             const SelctedproductDetails = {
                 product: fetchedProduct.id,
                 quantity: product.quantity,
-                price: product.price
+                price: fetchedProduct.price * product.quantity
             }
             selectedProducts.push(SelctedproductDetails);
         });
